@@ -37,8 +37,7 @@ X = data_treino[features]
 y = data_treino[target]
 
 
-# Divisão (Para o TCC, o ideal é manter a ordem cronológica, 
-# mas manter o shuffle agora para testar o código, use shuffle=False)
+# Divisao entre treino e teste
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
 #utilizando o robust scaler para lidar com outliers
