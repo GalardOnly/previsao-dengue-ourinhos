@@ -98,9 +98,9 @@ plt.ylabel('casos estimados')
 plt.grid()
 plt.show()
 
-# Garanta que a Semana Epidemiológica da saúde seja quebrada em Ano e SE (0-52)
+# Garantindo que a Semana Epidemiológica da saúde seja quebrada em Ano e SE (0-52)
 df_limpo['ano'] = df_limpo['Semana_Epidemiologica'] // 100
 df_limpo['Semana_Epidemiologica'] = df_limpo['Semana_Epidemiologica'] % 100
 
-#salvando o dataset limpo para um novo arquivo csv
+#salvando o dataset limpo
 df_limpo.to_csv('dengue_limpo.csv', index=False, encoding='latin-1')
