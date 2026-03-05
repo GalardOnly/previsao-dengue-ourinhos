@@ -1,0 +1,83 @@
+ COMO USAR OS NOTEBOOKS - GUIA RÁPIDO
+
+
+ RECOMENDADO: Previsao_Dengue_NARRATIVA_VISUAL.ipynb
+   → Melhor narrativa visual
+   → Conta uma história em 5 atos
+   → Gráficos profissionais
+
+ PASSO 1: ORGANIZE SEUS ARQUIVOS
+
+Coloque os 2 arquivos na MESMA PASTA:
+
+  Previsao_Dengue_NARRATIVA_VISUAL.ipynb
+  dataset_final_ourinhos.csv
+
+Estrutura correta:
+  
+   Minha Pasta/
+    ├─ Previsao_Dengue_NARRATIVA_VISUAL.ipynb
+    └─ dataset_final_ourinhos.csv
+
+ PASSO 2: ABRIR E EXECUTAR
+
+OPÇÃO A: Jupyter Notebook (Recomendado)
+  1. Abra terminal na pasta
+  2. Digite: jupyter notebook
+  3. Clique no arquivo .ipynb
+  4. Execute célula por célula (Shift + Enter)
+
+OPÇÃO B: Google Colab (Nuvem, grátis)
+  1. Acesse: https://colab.research.google.com
+  2. Faça upload do .ipynb
+  3. Coloque o CSV também
+  4. Execute as células
+
+OPÇÃO C: VS Code
+  1. Abra a pasta em VS Code
+  2. Instale extensão "Jupyter"
+  3. Clique em "Run All"
+
+
+ SE DER ERRO "FileNotFoundError"
+
+O problema é que o arquivo CSV não está no mesmo lugar do notebook.
+
+SOLUÇÃO 1 (Mais fácil):
+  ✓ Coloque dataset_final_ourinhos.csv na mesma pasta do notebook
+
+SOLUÇÃO 2 (Se não conseguir):
+  ✓ No notebook, encontre a linha:
+    df_dengue = pd.read_csv('dataset_final_ourinhos.csv'...)
+  
+  ✓ Substitua por:
+    df_dengue = pd.read_csv(r'C:\caminho\completo\dataset_final_ourinhos.csv'...)
+  
+  (Coloque o caminho completo do seu arquivo)
+
+SOLUÇÃO 3 (Google Colab):
+  ✓ Upload ambos os arquivos no Colab
+  ✓ Execute as células normalmente
+
+
+ O QUE VOCÊ VERÁ
+
+Quando executar corretamente, você terá:
+
+Gráfico 1: Série temporal de dengue (2014-2026)
+ Gráfico 2: Ciclo sazonal de clima (4 subgráficos)
+ Gráfico 3: Correlação com lags (como predizer)
+ Gráfico 4: Importância das features
+ Gráfico 5: Real vs Previsto (4 perspectivas)
+ Gráfico 6: Resumo executivo
+
+Cada gráfico conta parte de uma história!
+
+DICAS EXTRAS
+
+• Execute célula por célula para entender melhor
+• Leia os comentários e insights após cada gráfico
+• Está pronto para apresentação (professores vão amar)
+• Se quiser, pode rodar múltiplas vezes, dados são os mesmos
+
+
