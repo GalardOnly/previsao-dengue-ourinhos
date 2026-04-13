@@ -153,7 +153,7 @@ if "mes" not in df.columns:
 if "mes_seno" not in df.columns:
     df["mes_seno"] = np.sin(2 * np.pi * df["mes"] / 12)
 
-# ── Layout Plotly padrão (tema institucional claro)
+# Layout Plotly padrao (tema institucional claro)
 PLOTLY_LAYOUT = dict(
     paper_bgcolor=FUNDO,
     plot_bgcolor="#111128",
@@ -235,7 +235,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 
-# ── Filtro de período ──────────────────────────────────────────────────────
+# Filtro de periodo
 df_filtrado = df[(df["ano"] >= ano_filtro[0]) & (df["ano"] <= ano_filtro[1])].copy()
 
 # HEADER
@@ -329,9 +329,7 @@ k4.metric("Temp. média (°C)", f"{temp_media:.1f}" if not np.isnan(temp_media) 
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # ABAS PRINCIPAIS
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Série Temporal",
     "Clima × Dengue",
@@ -340,7 +338,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Sobre a Dengue",
 ])
 
-# ━━━━━━ ABA 1 — SÉRIE TEMPORAL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ABA 1 - SERIE TEMPORAL
 with tab1:
     st.markdown("### Série Histórica — Casos Estimados vs Reais")
 
@@ -379,7 +377,7 @@ with tab1:
     fig_ts.update_layout(**PLOTLY_LAYOUT, title="Casos estimados vs notificados — Ourinhos/SP", height=480)
     st.plotly_chart(fig_ts, use_container_width=True)
 
-    # ── Previsão futura ──────────────────────────────────────────────────
+    # Previsao futura
     st.markdown("### Previsão das Próximas Semanas")
     fig_prev = go.Figure()
 
@@ -425,7 +423,7 @@ with tab1:
     fig_prev.update_layout(**PLOTLY_LAYOUT, title="Previsão de casos — próximas semanas", height=400)
     st.plotly_chart(fig_prev, use_container_width=True)
 
-    # ── Comparação anual ────────────────────────────────────────────────
+    # Comparacao anual
     st.markdown("### Comparação Anual de Casos")
     anual = df_filtrado.groupby("ano")["casos_est"].sum().reset_index()
     fig_anual = px.bar(
@@ -437,11 +435,11 @@ with tab1:
     st.plotly_chart(fig_anual, use_container_width=True)
 
 
-# ━━━━━━ ABA 2 — CLIMA × DENGUE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ABA 2 - CLIMA x DENGUE
 with tab2:
     st.markdown("### Relação entre Variáveis Climáticas e Dengue")
 
-    # ── Temperatura + casos no mesmo gráfico de eixo duplo ─────────────
+    # Temperatura + casos no mesmo grafico de eixo duplo
     fig_clima = make_subplots(specs=[[{"secondary_y": True}]])
     fig_clima.add_trace(
         go.Scatter(
@@ -472,7 +470,7 @@ with tab2:
     fig_clima.update_xaxes(gridcolor="#222244")
     st.plotly_chart(fig_clima, use_container_width=True)
 
-    # ── Chuva × Casos ──────────────────────────────────────────────────
+    # Chuva x Casos
     fig_chuva = make_subplots(specs=[[{"secondary_y": True}]])
     fig_chuva.add_trace(
         go.Bar(
@@ -503,7 +501,7 @@ with tab2:
     fig_chuva.update_xaxes(gridcolor="#222244")
     st.plotly_chart(fig_chuva, use_container_width=True)
 
-    # ── Scatter com trendline ──────────────────────────────────────────
+    # Scatter com trendline
     col_s1, col_s2 = st.columns(2)
     with col_s1:
         fig_sc1 = px.scatter(
@@ -528,7 +526,7 @@ with tab2:
         st.plotly_chart(fig_sc2, use_container_width=True)
 
 
-# ━━━━━━ ABA 3 — MATRIZ DE CORRELAÇÃO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ABA 3 - MATRIZ DE CORRELACAO
 with tab3:
     st.markdown("### Matriz de Correlação entre Variáveis do Modelo")
 
@@ -564,7 +562,7 @@ with tab3:
     """, unsafe_allow_html=True)
 
 
-# ━━━━━━ ABA 4 — MAPA 3D DE OURINHOS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ABA 4 - MAPA 3D DE OURINHOS
 with tab4:
     st.markdown("### Mapa 3D de Ourinhos — SP")
 
@@ -599,7 +597,7 @@ with tab4:
     # Altura da coluna proporcional aos casos (escala visual)
     bairros_data["elevation"] = bairros_data["casos"] * 80
 
-    # ── Camada de colunas 3D ───────────────────────────────────────────
+    # Camada de colunas 3D
     column_layer = pdk.Layer(
         "ColumnLayer",
         data=bairros_data,
@@ -613,7 +611,7 @@ with tab4:
         extruded=True,
     )
 
-    # ── Camada de texto com nomes dos bairros ──────────────────────────
+    # Camada de texto com nomes dos bairros
     text_layer = pdk.Layer(
         "TextLayer",
         data=bairros_data,
@@ -627,7 +625,7 @@ with tab4:
         get_pixel_offset=[0, -20],
     )
 
-    # ── Anel de risco ao redor do centro (ScatterplotLayer) ────────────
+    # Anel de risco ao redor do centro (ScatterplotLayer)
     risco_center = pd.DataFrame([{
         "lat": LAT_OURINHOS,
         "lon": LON_OURINHOS,
@@ -645,7 +643,7 @@ with tab4:
         pickable=False,
     )
 
-    # ── View state com inclinação 3D ───────────────────────────────────
+    # View state com inclinacao 3D
     view_state = pdk.ViewState(
         latitude=LAT_OURINHOS,
         longitude=LON_OURINHOS,
@@ -673,7 +671,7 @@ with tab4:
 
     st.pydeck_chart(deck, height=600)
 
-    # ── Legenda e info ─────────────────────────────────────────────────
+    # Legenda e info
     col_map1, col_map2 = st.columns(2)
     with col_map1:
         st.markdown(f"""
@@ -707,7 +705,7 @@ with tab4:
     """, unsafe_allow_html=True)
 
 
-# ━━━━━━ ABA 5 — SOBRE A DENGUE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ABA 5 - SOBRE A DENGUE
 with tab5:
     st.markdown("### Informações sobre a Dengue")
 
@@ -782,7 +780,7 @@ with tab5:
 
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
-    # ── Ciclo de vida visual ─────────────────────────────────────────────
+    # Ciclo de vida visual
     st.markdown(f"""
     <div style="text-align:center; background:{CINZA_CARD}; border-radius:14px;
                 padding:28px; border:1px solid {BORDA}; margin:16px 0;">
@@ -809,9 +807,7 @@ with tab5:
     """, unsafe_allow_html=True)
 
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# RODAPÉ
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# RODAPE
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 st.markdown(f"""
 <div style="text-align:center; padding:16px; color:{TEXTO_SECUNDARIO}; font-size:13px;">

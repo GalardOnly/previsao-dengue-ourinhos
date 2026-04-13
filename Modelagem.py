@@ -60,7 +60,7 @@ y_pred = modelo_rf.predict(X_test)
 print(f"Erro Médio Absoluto (MAE): {mean_absolute_error(y_test, y_pred):.2f}")
 print(f"R² Score (Precisão): {r2_score(y_test, y_pred):.2f}")
 
-# ── Modelo com distribuição Poisson (XGBoost) 
+# Modelo com distribuicao Poisson (XGBoost) 
 # Dados de contagem (casos de dengue) seguem melhor uma distribuição de Poisson
 # do que a normal assumida pelo RF padrão. O XGBoost permite trocar o objective
 # para 'count:poisson' ou 'reg:tweedie', tratando a natureza dos dados.
@@ -97,7 +97,7 @@ print(f"\n--- XGBoost Tweedie ---")
 print(f"Erro Médio Absoluto (MAE): {mean_absolute_error(y_test, y_pred_tweedie):.2f}")
 print(f"R² Score (Precisão): {r2_score(y_test, y_pred_tweedie):.2f}")
 
-# ── Comparação visual dos 3 modelos ────────────────────────────────────────
+# Comparacao visual dos 3 modelos
 datas_teste_comp = data_treino.loc[X_test.index, 'Data_Inicio_Semanas'].values
 
 plt.figure(figsize=(14, 5))
@@ -121,7 +121,7 @@ print(f"{'XGBoost Poisson':<30} {mean_absolute_error(y_test, y_pred_poisson):>8.
 print(f"{'XGBoost Tweedie':<30} {mean_absolute_error(y_test, y_pred_tweedie):>8.2f} {r2_score(y_test, y_pred_tweedie):>8.3f}")
 
 
-# ── Selecionar melhor modelo automaticamente ───────────────────────────────
+# Selecionar melhor modelo automaticamente
 modelos_resultado = {
     'Random Forest (RobustScaler)': (modelo_rf_robust, y_pred_robust),
     'XGBoost Poisson': (modelo_poisson, y_pred_poisson),
@@ -405,7 +405,7 @@ ARQUIVO_DADOS_PDF    = 'Data/dataset_final_ourinhos.csv'
 ARQUIVO_PREVISAO_PDF = 'previsao_proximas_semanas.csv'
 ARQUIVO_SAIDA_PDF    = 'relatorio_dengue_ourinhos.pdf'
 
-# ── carregar dados ──────────────────────────────────────────────────────────
+# Carregar dados
 df_pdf = pd.read_csv(ARQUIVO_DADOS_PDF, sep=';', encoding='latin-1')
 df_pdf['Data_Inicio_Semanas'] = pd.to_datetime(df_pdf['Data_Inicio_Semanas'])
 df_pdf = df_pdf.sort_values('Data_Inicio_Semanas').reset_index(drop=True)
@@ -416,7 +416,7 @@ ultima_pdf = df_pdf.iloc[-1]
 ano_ult = int(ultima_pdf['ano'])
 sem_ult = int(ultima_pdf['Semana_Epidemiologica'])
 
-# ── agregado anual ───────────────────────────────────────────────────────────
+# Agregado anual
 anual = df_pdf.groupby('ano').agg(
     casos_reais=('casos_reais', 'sum'),
     casos_est=('casos_est', 'sum'),
@@ -424,16 +424,14 @@ anual = df_pdf.groupby('ano').agg(
     rt_medio=('Rt', 'mean')
 ).reset_index()
 
-# ── cores ────────────────────────────────────────────────────────────────────
+# Cores
 AZUL_PDF     = '#185FA5'
 VERMELHO_PDF = '#A32D2D'
 LARANJA_PDF  = '#854F0B'
 VERDE_PDF    = '#3B6D11'
 CINZA_PDF    = '#5F5E5A'
 
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURA 1 — série histórica anual
-# ══════════════════════════════════════════════════════════════════════════════
+# FIGURA 1 - serie historica anual
 def fig_serie_anual():
     fig, ax = plt.subplots(figsize=(9, 3.5))
     anos = anual['ano'].values
@@ -458,9 +456,7 @@ def fig_serie_anual():
     fig.tight_layout()
     return fig_to_bytes(fig)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURA 2 — previsão com intervalo de confiança
-# ══════════════════════════════════════════════════════════════════════════════
+# FIGURA 2 - previsao com intervalo de confianca
 def fig_previsao_pdf():
     fig, ax = plt.subplots(figsize=(9, 3.5))
     semanas = df_prev_pdf['semana_futura'].values
@@ -497,9 +493,7 @@ def fig_previsao_pdf():
     fig.tight_layout()
     return fig_to_bytes(fig)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURA 3 — importância das variáveis
-# ══════════════════════════════════════════════════════════════════════════════
+# FIGURA 3 - importancia das variaveis
 def fig_importancia():
     feat_names = ['casos_mm4','casos_lag_1','casos_lag_2',
                   'chuva','chuva_lag_3','temp_ar',
@@ -532,9 +526,7 @@ def fig_to_bytes(fig):
     buf.seek(0)
     return buf
 
-# ══════════════════════════════════════════════════════════════════════════════
 # MONTAR PDF
-# ══════════════════════════════════════════════════════════════════════════════
 doc = SimpleDocTemplate(
     ARQUIVO_SAIDA_PDF,
     pagesize=A4,
