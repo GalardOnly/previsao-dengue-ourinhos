@@ -3,15 +3,15 @@ import numpy as np
 import glob
 
 #carregando os arquivos csv do sinan e deixando em apenas um dataframe com a função glob
-arquivos_csv = glob.glob('C:\\Projeto tcc\\csv\\*.csv')
-df_projeto = pd.read_csv('C:\\Projeto tcc\\df_projeto.csv', encoding='latin-1', sep=';')
+arquivos_csv = glob.glob('C:\\Projeto tcc\\Data\\DENGBR*_OURINHOS.csv')
+df_projeto = pd.read_csv('C:\\Projeto tcc\\Data\\df_projeto.csv', encoding='latin-1', sep=';')
 
 data_sus = pd.DataFrame()
 for arquivo in arquivos_csv:
     df_temp = pd.read_csv(arquivo, sep=';', encoding='latin-1')
     data_sus = pd.concat([data_sus, df_temp], ignore_index=True)
 
-data_sus.to_csv('C:\\Projeto tcc\\dados_sinan_completo.csv', index=False, encoding='latin-1', sep=';')
+data_sus.to_csv('C:\\Projeto tcc\\Data\\dados_sinan_completo.csv', index=False, encoding='latin-1', sep=';')
 print("Processamento concluído. O arquivo 'dados_sinan_completo.csv' foi criado com sucesso.")
 print(data_sus.columns.tolist())
 
@@ -113,6 +113,6 @@ print(f"Dataset final: {df_final.shape[0]} semanas e {df_final.shape[1]} colunas
 print(f"\nNulos por coluna:\n{df_final.isnull().sum()[df_final.isnull().sum() > 0]}")
 print(f'merge completo. Anos no final: {sorted(df_final["ano"].unique())}')
 
-df_final.to_csv('C:\\Projeto tcc\\dataset_final_ourinhos.csv', index=False, encoding='latin-1', sep=';')
+df_final.to_csv('C:\\Projeto tcc\\Data\\dataset_final_ourinhos.csv', index=False, encoding='latin-1', sep=';')
 
-print("✅ Dataset final criado com sucesso! O arquivo 'dataset_final_ourinhos.csv' está pronto para análise.")
+print(" Dataset final criado com sucesso! O arquivo 'dataset_final_ourinhos.csv' está pronto para análise.")

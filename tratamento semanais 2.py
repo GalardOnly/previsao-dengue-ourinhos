@@ -64,7 +64,7 @@ df_clima_final = df_clima_semanal[
 ].reset_index(drop=True)
 
 #  DADOS DE SAÚDE
-df_saude = pd.read_csv("dengue_3-6.csv", encoding="latin-1")
+df_saude = pd.read_csv("Data/dengue_3-6.csv", encoding="latin-1")
 df_saude['Data_Inicio_Semanas'] = pd.to_datetime(df_saude['data_iniSE'])
 
 # Desmembrando a coluna SE para garantir o Merge
@@ -93,7 +93,7 @@ for col in ['umidmed', 'umidmin', 'tempmed', 'tempmax']:
             lambda x: x.fillna(x.median())
         )
 
-df_projeto.to_csv('C:\\Projeto tcc\\df_projeto.csv', index=False, encoding='latin-1', sep=';')
+df_projeto.to_csv('C:\\Projeto tcc\\Data\\df_projeto.csv', index=False, encoding='latin-1', sep=';')
 
 print(f"Sucesso! Dataset de Ourinhos criado com {df_projeto.shape[0]} semanas e {df_projeto.shape[1]} colunas.")
 
