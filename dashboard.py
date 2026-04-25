@@ -181,6 +181,8 @@ def nivel_risco(casos):
 
 # SIDEBAR
 
+
+# --- SIDEBAR ---
 with st.sidebar:
     st.markdown(f"""
     <div style="text-align:center;">
@@ -196,6 +198,28 @@ with st.sidebar:
         options=anos_disponiveis,
         value=(anos_disponiveis[0], anos_disponiveis[-1]),
     )
+
+    # Filtro por bairro
+    bairros_lista = [
+        "Todos",
+        "Centro", "Vila Brasil", "Jd. Matilde", "Jd. Paulista", "Vila Musa",
+        "Jd. Ouro Verde", "Vila Nova", "Jd. Europa", "Jd. Santa Fé",
+        "Pq. Minas Gerais", "Vila Margarida", "Jd. São Paulo"
+    ]
+    bairro_filtro = st.selectbox("Bairro", bairros_lista, index=0)
+
+    st.markdown('<hr class="divider">', unsafe_allow_html=True)
+
+    # Painel de notícias (RSS)
+    import feedparser
+    st.markdown(f"<b style='color:{VERDE_ESCURO}'>Notícias sobre Dengue</b>", unsafe_allow_html=True)
+    try:
+        feed = feedparser.parse("https://g1.globo.com/rss/g1/saude/")
+        noticias = [entry for entry in feed.entries if "dengue" in entry.title.lower()][:3]
+        for n in noticias:
+            st.markdown(f"<a href='{n.link}' target='_blank' style='color:{VERDE_CLARO};'>{n.title}</a>", unsafe_allow_html=True)
+    except Exception:
+        st.write("Não foi possível carregar notícias.")
 
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
@@ -235,8 +259,11 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 
-# Filtro de periodo
+
+# --- FILTRO DE PERÍODO E BAIRRO ---
 df_filtrado = df[(df["ano"] >= ano_filtro[0]) & (df["ano"] <= ano_filtro[1])].copy()
+if bairro_filtro != "Todos" and "bairro" in df_filtrado.columns:
+    df_filtrado = df_filtrado[df_filtrado["bairro"] == bairro_filtro]
 
 # HEADER
 st.markdown(f"""
@@ -330,12 +357,13 @@ k4.metric("Temp. média (°C)", f"{temp_media:.1f}" if not np.isnan(temp_media) 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 # ABAS PRINCIPAIS
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "Série Temporal",
     "Clima × Dengue",
     "Matriz de Correlação",
     "Mapa de Ourinhos",
     "Sobre a Dengue",
+    "Explicação do Modelo",
 ])
 
 # ABA 1 - SERIE TEMPORAL
@@ -563,22 +591,20 @@ with tab3:
 
 
 # ABA 4 - MAPA 3D DE OURINHOS
+# ABA 4 - MAPA 3D DE OURINHOS
+
 with tab4:
     st.markdown("### Mapa 3D de Ourinhos — SP")
-
-    # Centro de Ourinhos
     LAT_OURINHOS = -22.9786
     LON_OURINHOS = -49.8709
-
-    # Bairros/regiões com colunas 3D proporcionais ao risco simulado
+    # Dados dos bairros
     if prox_semana is not None:
         lbl_r, _ = nivel_risco(prox_semana["casos_previstos"])
         base_casos = prox_semana["casos_previstos"]
     else:
         lbl_r = "—"
         base_casos = 5
-
-    bairros_data = pd.DataFrame([
+    bairros_lista_map = [
         {"nome": "Centro",          "lat": -22.9786, "lon": -49.8709, "casos": base_casos * 1.0,  "cor": [0, 121, 107, 200]},
         {"nome": "Vila Brasil",     "lat": -22.9730, "lon": -49.8580, "casos": base_casos * 0.7,  "cor": [38, 166, 154, 180]},
         {"nome": "Jd. Matilde",     "lat": -22.9860, "lon": -49.8800, "casos": base_casos * 0.5,  "cor": [38, 166, 154, 180]},
@@ -591,12 +617,14 @@ with tab4:
         {"nome": "Pq. Minas Gerais","lat": -22.9750, "lon": -49.8550, "casos": base_casos * 0.45, "cor": [128, 203, 196, 160]},
         {"nome": "Vila Margarida",  "lat": -22.9820, "lon": -49.8760, "casos": base_casos * 0.5,  "cor": [38, 166, 154, 180]},
         {"nome": "Jd. São Paulo",   "lat": -22.9710, "lon": -49.8680, "casos": base_casos * 0.75, "cor": [0, 121, 107, 200]},
-    ])
-    # Arredondar casos para exibição limpa no tooltip
+    ]
+    bairros_data = pd.DataFrame(bairros_lista_map)
     bairros_data["casos"] = bairros_data["casos"].round(0).astype(int)
-    # Altura da coluna proporcional aos casos (escala visual)
     bairros_data["elevation"] = bairros_data["casos"] * 80
-
+    # Filtro interativo no mapa
+    bairro_selecionado = st.selectbox("Selecione um bairro para destacar no mapa:", ["Todos"] + [b["nome"] for b in bairros_lista_map], index=0)
+    if bairro_selecionado != "Todos":
+        bairros_data["cor"] = bairros_data.apply(lambda row: row["cor"] if row["nome"] == bairro_selecionado else [180,180,180,80], axis=1)
     # Camada de colunas 3D
     column_layer = pdk.Layer(
         "ColumnLayer",
@@ -610,7 +638,6 @@ with tab4:
         auto_highlight=True,
         extruded=True,
     )
-
     # Camada de texto com nomes dos bairros
     text_layer = pdk.Layer(
         "TextLayer",
@@ -624,7 +651,6 @@ with tab4:
         get_alignment_baseline='"bottom"',
         get_pixel_offset=[0, -20],
     )
-
     # Anel de risco ao redor do centro (ScatterplotLayer)
     risco_center = pd.DataFrame([{
         "lat": LAT_OURINHOS,
@@ -642,8 +668,6 @@ with tab4:
         line_width_min_pixels=2,
         pickable=False,
     )
-
-    # View state com inclinacao 3D
     view_state = pdk.ViewState(
         latitude=LAT_OURINHOS,
         longitude=LON_OURINHOS,
@@ -651,7 +675,6 @@ with tab4:
         pitch=55,
         bearing=-15,
     )
-
     deck = pdk.Deck(
         layers=[scatter_layer, column_layer, text_layer],
         initial_view_state=view_state,
@@ -668,9 +691,7 @@ with tab4:
             },
         },
     )
-
     st.pydeck_chart(deck, height=600)
-
     # Legenda e info
     col_map1, col_map2 = st.columns(2)
     with col_map1:
@@ -694,13 +715,42 @@ with tab4:
             <small style="color:{VERDE}">Passe o mouse sobre as colunas para ver detalhes.</small>
         </div>
         """, unsafe_allow_html=True)
-
     st.markdown(f"""
     <div class="info-box">
         <b style="color:{VERDE_ESCURO}">Nota:</b>
         Os valores por bairro são estimativas proporcionais baseadas na previsão
         municipal do modelo. Dados georreferenciados por bairro serão
         integrados futuramente com o módulo do SINAN para maior precisão.
+    </div>
+    """, unsafe_allow_html=True)
+# ABA 6 - EXPLICAÇÃO DO MODELO
+with tab6:
+    st.markdown("## Explicação do Modelo Preditivo")
+    st.markdown(f"""
+    <div class="info-box">
+        <b style="color:{VERDE_ESCURO}">Como funciona o modelo?</b><br><br>
+        O modelo utiliza algoritmos de aprendizado de máquina (XGBoost Tweedie e Random Forest) para prever o número de casos de dengue nas próximas semanas, considerando variáveis climáticas (chuva, temperatura, umidade), dados epidemiológicos e lags temporais.<br><br>
+        <b style="color:{VERDE}">Principais variáveis:</b><br>
+        • Chuva semanal<br>
+        • Temperatura média semanal<br>
+        • Lags de chuva e temperatura<br>
+        • Casos de dengue em semanas anteriores<br>
+        • Idade média dos casos<br>
+        <br>
+        <b style="color:{VERDE}">Importância das variáveis:</b><br>
+        O modelo avalia a importância de cada variável para a previsão. Em geral, chuva e casos anteriores têm maior peso.<br><br>
+        <b style="color:{VERDE}">Limitações:</b><br>
+        • Dados incompletos ou atrasados podem afetar a precisão<br>
+        • Não considera fatores sociais ou mutações do vírus<br>
+        • Previsão é probabilística, não determinística<br>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="info-box">
+        <b style="color:{VERDE_ESCURO}">Como interpretar?</b><br><br>
+        • As previsões indicam tendência, não valores exatos<br>
+        • Use em conjunto com ações de vigilância e prevenção<br>
+        • Consulte sempre fontes oficiais de saúde<br>
     </div>
     """, unsafe_allow_html=True)
 
